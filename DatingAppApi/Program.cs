@@ -15,6 +15,8 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<DataContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddAutoMapper(typeof(AutomapperProfiles));
+builder.Services.AddCors();
+
 
 //inject reposiroty implementations
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
@@ -36,6 +38,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseCors(builder => builder.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:4200"));
 
 app.MapControllers();
 
