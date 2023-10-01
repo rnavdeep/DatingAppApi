@@ -5,7 +5,10 @@ using System.Threading.Tasks;
 using AutoMapper;
 using DatingAppApi.Data;
 using DatingAppApi.Entities.Domain.Users;
+using DatingAppApi.Entities.DTO.Users;
+using DatingAppApi.Repositories.TokenRepository;
 using DatingAppApi.Repositories.UsersRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,16 +16,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DatingAppApi.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
         private readonly IUsersRepository usersRepository;
+        private readonly ITokenRepository tokenRepository;
         private readonly IMapper mapper;
-        public UsersController(IUsersRepository usersRepository,IMapper mapper)
+        public UsersController(IUsersRepository usersRepository,IMapper mapper, ITokenRepository tokenRepository)
         {
             this.usersRepository = usersRepository;
             this.mapper = mapper;
+            this.tokenRepository = tokenRepository;
         }
 
         [HttpGet]
@@ -45,6 +51,67 @@ namespace DatingAppApi.Controllers
             {
                 return NotFound();
             }
+        }
+
+        [HttpPost("Register")]
+        public async Task<ActionResult<UserDto>> Register([FromBody] AppUserDtoIncoming appUserDtoIncoming)
+        {
+            if (ModelState.IsValid)
+            {
+                //convert dto to domain model
+                var appuser = mapper.Map<AppUser>(appUserDtoIncoming);
+
+                appuser = await usersRepository.Register(appuser, appUserDtoIncoming.Password);
+
+                if (appuser != null)
+                {
+                    //convert to dto
+                    var returnAppUser = new UserDto
+                    {
+                        UserName = appuser.UserName,
+                        Token = tokenRepository.CreateToken(appuser)
+                    };
+
+                    return returnAppUser;
+                }
+                else
+                {
+                    return BadRequest("Username already exists");
+                }
+
+            }
+            else
+            {
+                return BadRequest(ModelState);
+            }
+        }
+        [HttpPost("Login")]
+        public async Task<ActionResult<UserDto>> Login([FromBody] LoginUserDto loginUserDto)
+        {
+            var loginUser = mapper.Map<LoginUser>(loginUserDto);
+
+            try
+            {
+                var appUser = await usersRepository.Login(loginUser);
+                if(appUser != null)
+                {
+                    var returnAppUser = new UserDto
+                    {
+                        UserName = appUser.UserName,
+                        Token = tokenRepository.CreateToken(appUser)
+                    };
+                    return returnAppUser ;
+                }
+                else
+                {
+                    throw new UnauthorizedAccessException("Invalid UserName or Password");
+                }
+            }
+            catch (Exception e)
+            {
+                return Unauthorized();
+            }
+                       
         }
     }
 }

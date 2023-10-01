@@ -5,23 +5,21 @@ using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.FileProviders;
 using DatingAppApi.Repositories.UsersRepository;
 using DatingAppApi.Mappings;
+using DatingAppApi.Repositories.TokenRepository;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using DatingAppApi.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-//inject db service to the application
-builder.Services.AddDbContext<DataContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddAutoMapper(typeof(AutomapperProfiles));
-builder.Services.AddCors();
 
-
-//inject reposiroty implementations
-builder.Services.AddScoped<IUsersRepository, UsersRepository>();
-
-
+//use extension methods
+builder.Services.AddApplicationServices(builder.Configuration);
+builder.Services.AddIdentityServices(builder.Configuration);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -39,7 +37,12 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.UseCors(builder => builder.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:4200"));
+app.UseCors(builder => builder.AllowAnyHeader().AllowAnyMethod()
+.WithOrigins("https://localhost:4200"));
+
+//add after cors and controller mapper
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 
