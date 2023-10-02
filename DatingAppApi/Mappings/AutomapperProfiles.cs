@@ -10,7 +10,13 @@ namespace DatingAppApi.Mappings
 		public AutomapperProfiles()
 		{
 			CreateMap<AppUser, AppUserDto>().ReverseMap();
-		}
-	}
+            CreateMap<AppUser, AppUserDtoIncoming>().ReverseMap();
+            CreateMap<LoginUser, LoginUserDto>().ReverseMap();
+            CreateMap<AppUser, LoginUser>().ReverseMap();
+            CreateMap<AppUser, UserDto>().ReverseMap();
+
+
+        }
+    }
 }
 
