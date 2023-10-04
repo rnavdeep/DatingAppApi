@@ -1,2 +1,3 @@
 # DatingAppApi
-Dating Application Backend
+Dating Application Client and API
+
