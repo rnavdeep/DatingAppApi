@@ -1,5 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { AccountService } from '../services/account.service';
+import { map } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-home',
@@ -8,30 +12,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HomeComponent implements OnInit {
   registerMode = false;
-  users:any;
-  constructor(private http:HttpClient){}
+  constructor(private http:HttpClient, private router:Router,public accountService:AccountService,private toastr:ToastrService){}
 
   ngOnInit():void{
-    this.getUsers();
 
   }
   registerToggle(){
-    this.registerMode = !this.registerMode;
+    this.router.navigateByUrl("/register");
   }
-  getUsers(){
-    this.http.get('https://localhost:7028/api/Users').subscribe({
-      next: (response)=>{
-        this.users = response;
-      },
-      error: (error) => {
-        console.log(error);
-      },
-      complete: () =>{
-        console.log('request is complete');
-      }
-    })
-  }
-  cancelRegisterMode(event:boolean){
-    this.registerMode = event;
+  loginToggle(){
+    this.router.navigateByUrl("/login");
   }
 }

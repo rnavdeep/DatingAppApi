@@ -1,17 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { AccountService } from '../services/account.service';
-import { JsonPipe } from '@angular/common';
-import { Observable, map, of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { User } from '../models/user';
+import { AccountService } from '../services/account.service';
+import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
-import {ToastrService} from 'ngx-toastr'
 
 @Component({
-  selector: 'app-nav',
-  templateUrl: './nav.component.html',
-  styleUrls: ['./nav.component.css']
+  selector: 'app-login',
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css']
 })
-export class NavComponent implements OnInit {
+export class LoginComponent implements OnInit {
   model: any = {}
   currentUser$: Observable<User | null> = of(null);
   constructor(public accountService:AccountService, public router:Router,private toast:ToastrService){ }
@@ -35,14 +34,18 @@ export class NavComponent implements OnInit {
         var error = err.statusText;
         if(error!=null){
           this.toast.error(err.statusText);
+        }else{
+          this.router.navigateByUrl("/");
         }
-        this.router.navigateByUrl("/");
       }
     })
   }
 
   logout(){
     this.accountService.logout();
+    this.router.navigateByUrl("/");
+  }
+  cancel(){
     this.router.navigateByUrl("/");
 
   }
