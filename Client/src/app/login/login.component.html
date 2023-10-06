@@ -1,0 +1,16 @@
+<!-- login.component.html -->
+<div class="login-container">
+  <h2 class="text-center text-primary">LogIn</h2>
+  <form #loginForm="ngForm" *ngIf="!(accountService.currentUsers$ | async)" (ngSubmit)="login()" autocomplete="off">
+    <div class="login-input">
+      <input name="username" [(ngModel)]="model.username" class="form-control" type="text" placeholder="Username">
+    </div>
+    <div class="login-input">
+      <input name="password" [(ngModel)]="model.password" class="form-control" type="password" placeholder="Password">
+    </div>
+    <div class="text-center">
+      <button class = "btn btn-success me-2" type="submit">Submit</button>
+      <button class = "btn btn-default" type="button" (click)="cancel()" >Cancel</button>
+    </div>
+  </form>
+</div>
