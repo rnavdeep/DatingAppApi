@@ -16,7 +16,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DatingAppApi.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
@@ -89,29 +89,21 @@ namespace DatingAppApi.Controllers
         public async Task<ActionResult<UserDto>> Login([FromBody] LoginUserDto loginUserDto)
         {
             var loginUser = mapper.Map<LoginUser>(loginUserDto);
-
-            try
+            var appUser = await usersRepository.Login(loginUser);
+            if(appUser != null)
             {
-                var appUser = await usersRepository.Login(loginUser);
-                if(appUser != null)
+                var returnAppUser = new UserDto
                 {
-                    var returnAppUser = new UserDto
-                    {
-                        UserName = appUser.UserName,
-                        Token = tokenRepository.CreateToken(appUser)
-                    };
-                    return returnAppUser ;
-                }
-                else
-                {
-                    throw new UnauthorizedAccessException("Invalid UserName or Password");
-                }
+                    UserName = appUser.UserName,
+                    Token = tokenRepository.CreateToken(appUser)
+                };
+                return returnAppUser ;
             }
-            catch (Exception e)
+            else
             {
-                return Unauthorized();
+                throw new Exception("Invalid UserName or Password");
             }
-                       
+                                 
         }
     }
 }
