@@ -9,6 +9,8 @@ import { AuthGuard } from './guards/auth.guard';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { loginRegisterGuard } from './guards/login-register.guard';
+import { NotFoundComponent } from './errors/not-found/not-found.component';
+import { ServerErrorComponent } from './errors/server-error/server-error.component';
 
 const routes: Routes = [
   {path: 'home',component:HomeComponent},
@@ -18,6 +20,8 @@ const routes: Routes = [
   {path: 'members',component:MemberListComponent,canActivate: [AuthGuard]},
   {path: 'members/:id',component:MemberDetailComponent,canActivate: [AuthGuard]},
   {path: 'lists',component:ListsComponent,canActivate: [AuthGuard]},
+  {path: 'not-found',component:NotFoundComponent},
+  {path: 'server-error',component:ServerErrorComponent},
   {path: 'messages',component:MessagesComponent,canActivate: [AuthGuard]},
   {path: '**',component:HomeComponent,pathMatch:'full',canActivate: [AuthGuard]},
 ];
